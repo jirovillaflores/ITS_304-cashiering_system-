@@ -48,7 +48,7 @@ if (isset($_POST['signup'])) {
             $response = array(
                 'success' => "Data has been inserted successfully!",
             );
-        } else if ($insert === 2) {
+        } else if ($insert === 3) {
             $response = array(
                 'error' => "Email already exists!",
             );

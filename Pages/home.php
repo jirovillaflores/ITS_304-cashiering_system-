@@ -16,6 +16,24 @@
         </div>
     </dialog>
 
+    <dialog id="my_modal_2" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Login Form</h3>
+            <div class="modal-action">
+                <form method="">
+                    <input type="text" placeholder="Email" id="email" class="input input-ghost"/>
+                    <input type="password" placeholder="Password" id="pass" class="input input-ghost"/><br>
+                    <a href="../handlers/signup.php">Forgot Password</a>
+                    <br><br>
+                    <button class="btn --btn-login">Login</button>    
+                    
+                </form>
+            </div>
+        </div>
+    </dialog>
+    
+
+    
 
     <div class="navbar bg-base-100 shadow-sm">
         <div class="navbar-start">
@@ -54,6 +72,8 @@
             </ul>
         </div>
         <div class="navbar-end">
+            <button class="btn" onclick="my_modal_2.showModal()">Login</button>    
+    </div>
             <a class="btn" onclick="my_modal_1.showModal()">Sign up</a>
         </div>
     </div>
@@ -85,95 +105,6 @@
         <a href="#item2" class="btn btn-xs">2</a>
         <a href="#item3" class="btn btn-xs">3</a>
         <a href="#item4" class="btn btn-xs">4</a>
-    </div>
-
-    <center><a href="" style="font-size: 3rem">Available Products</a></center>
-
-    <div style="display: flex; gap: 20px;">
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-base-100 w-96 shadow-sm">
-            <figure>
-                <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <footer class="footer sm:footer-horizontal bg-neutral text-neutral-content p-10">

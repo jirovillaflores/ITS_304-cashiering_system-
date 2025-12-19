@@ -1,160 +1,77 @@
 <?php
 require_once('Connection.php');
 
-class Users extends Dbh
-{
-    public function signup($email, $hashed_password)
-    {
-        
-        $search = $this->connect()->prepare('SELECT email FROM user WHERE email = ?');
-        $search->bind_param('s', $email);
-        $search->execute();
-        $search->store_result();
+class Users extends Dbh {
 
-        if ($search->num_rows > 0) {
-            return 3; // Email already exists
-        }
+    // SIGNUP
+    public function signup($email, $hashed_password) {
+        $conn = $this->connect();
+        $stmt = $conn->prepare('SELECT email FROM user WHERE email = ?');
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-        $stmt = $this->connect()->prepare(
-            'INSERT INTO user (email, pass, created_at) VALUES (?, ?, NOW())'
-        );
+        if ($stmt->num_rows > 0) return 3; // Email already exists
 
+        $stmt = $conn->prepare('INSERT INTO user (email, pass, created_at) VALUES (?, ?, NOW())');
         $stmt->bind_param('ss', $email, $hashed_password);
-        $result = $stmt->execute();
-
-        if ($result) {
-            return 1; // Success
-        } else {
-            return 2; // Database error
-        }
+        return $stmt->execute() ? 1 : 2;
     }
-  
+
+    // LOGIN
     public function login($email, $pass) {
-    session_start();
+        session_start();
+        $conn = $this->connect();
+        $stmt = $conn->prepare('SELECT id, email, pass FROM user WHERE email = ?');
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $stmt = $this->connect()->prepare("SELECT id, email, pass FROM user WHERE email = ?");
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // USER FOUND?
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_array()){
-             $hashed_password = $row['pass'];
-
-        // PASSWORD CHECK
-        if (password_verify($pass, $hashed_password)) {
-            $_SESSION['id'] = $row['id'];
-            $_SESSION['email'] = $row['email'];
-
-            $redirect = ($_SESSION['id'] == 1)
-                ? '../public/admin/home.php'
-                : '../public/customers/home.php';
-
-            return $redirect;
-
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if (password_verify($pass, $row['pass'])) {
+                $_SESSION['id'] = $row['id'];
+                $_SESSION['email'] = $row['email'];
+                return ($_SESSION['id'] == 1)
+                    ? '../public/admin/home.php'
+                    : '../public/customers/home.php';
+            } else {
+                return 9; // Incorrect password
+            }
         } else {
-            return 9; // incorrect password
-        }
-    }
-    } else {
-        return 8; // user not found
-    }
-    }
-
-    public function addOrder($amount, $add, $contact, $userId)
-    {
-        // Generate a unique order id
-        $order_id = uniqid('ORD-');
-
-        // Default quantity (adjust if your app tracks quantities separately)
-        $quantity = 1;
-
-        // Ensure types are correct
-        $userId = (int) $userId;
-        $amount = (float) $amount;
-
-        $stmt = $this->connect()->prepare(
-            "INSERT INTO orders (order_id, user_id, quantity, total_amount, status, address, contact) VALUES (?, ?, ?, ?, 'pending', ?, ?)"
-        );
-
-        if (!$stmt) {
-            return 2; // prepare failed
-        }
-
-        // bind_param types: s = string, i = integer, d = double
-        $stmt->bind_param('siidss', $order_id, $userId, $quantity, $amount, $add, $contact);
-
-        if ($stmt->execute()) {
-            return 1; // success
-        } else {
-            return 2; // failure
+            return 8; // User not found
         }
     }
 
-     public function UserOrders($id) {
+    // ADD ORDER
+    public function orderNow($userId, $totalAmount) {
+        $conn = $this->connect();
+        $userId = (int)$userId;
+        $totalAmount = (float)$totalAmount;
+        $status = 'Pending';
 
-    $conn = $this->connect();
-    if (!$conn) {
-        die("Database connection failed: " . $conn->connect_error);
+        $stmt = $conn->prepare('INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, ?)');
+        if (!$stmt) return false;
+
+        $stmt->bind_param('ids', $userId, $totalAmount, $status);
+        return $stmt->execute() ? 1 : false;
     }
 
-    $sql = "SELECT * FROM user u INNER JOIN orders o ON o.user_id = u.id WHERE u.id = ?";
-    
-    
-    $stmt = $conn->prepare($sql);
-
-    if (!$stmt) {
-        die("Query preparation failed: " . $conn->error);
+    // GET ORDERS FOR SPECIFIC USER
+    public function UserOrders($userId) {
+        $conn = $this->connect();
+        $stmt = $conn->prepare('SELECT order_id, user_id, total_amount, status FROM orders WHERE user_id = ? ORDER BY order_id DESC');
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
 
-
-    return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : null;
+    // GET ALL ORDERS (ADMIN VIEW)
+    public function getAllOrders() {
+        $conn = $this->connect();
+        $result = $conn->query('SELECT order_id, user_id, total_amount, status FROM orders ORDER BY order_id DESC');
+        return $result->num_rows ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
 }
-
-
-public function updateOrder($id) {
-    $conn = $this->connect();
-    if (!$conn) {
-        die("Database connection failed: " . $conn->connect_error);
-    }
-
-    $sql = "SELECT * FROM user WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-
-    if (!$stmt) {
-        die("Query preparation failed: " . $conn->error);
-    }
-
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
-
-}
-
-public function deleteOrder($id) {
-    $conn = $this->connect();
-    if (!$conn) {
-        die("Database connection failed: " . $conn->connect_error);
-    }
-
-    $sql = "SELECT * FROM user WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-
-    if (!$stmt) {
-        die("Query preparation failed: " . $conn->error);
-    }
-
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    return $result->num_rows > 0 ? $result->fetch_assoc() : null;
-
-}
-}
+?>
